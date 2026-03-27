@@ -1,0 +1,121 @@
+{% load static %}
+
+<html lang="ja">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+
+        <!--★★★　2026-02-14 ★★★<title>One Page Wonder - Start Bootstrap Template</title> から以下に変更-->
+        <title>{% block title %}{% endblock %}</title>
+
+        <!--★★★ 2025-02-22変更 ★★★ fabicon設定-　本にはファビコンの記述はなかった、Djangoではstaticを使うのが正しい-->
+        <!-- <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />  -->
+        <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
+        <!-- Font Awesome icons (free version)-->
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script><!--アイコンを表示-->
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i" rel="stylesheet" />
+
+        <!--★★★ 2025-02-22変更 ★★★ Core theme CSS (includes Bootstrap)Djangoではstaticを使うのが正しい-->
+        <!-- <link href="css/styles.css" rel="stylesheet" /> -->
+        <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+        <!-- ★★★ 2025-02-20追加 ★★★ My Style 今はCSSであることが自動判別できるようになったのでtype=の部分は不要※あってもエラーにはならない -->
+        <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/mystyle.css' %}"> -->
+        <link rel="stylesheet" href="{% static 'css/mystyle.css' %}">
+    </head>
+
+    <body id="page-top">
+        <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+            <div class="container px-5">
+                <!-- クリックするとページの一番上に戻る -->
+                <!--★★★ 2025-02-21変更 ★★★ <a class="navbar-brand" href="#page-top">Start Bootstrap</a> -->
+                <a class="navbar-brand" href="{% url 'diary:index' %}">PRIVATE DIARY</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <!-- 右側 -->
+                    <ul class="navbar-nav me-auto">
+                        {% if user.is_authenticated %}
+                        <!--★★★ 2025-02-21変更 ★★★ <li class="nav-item"><a class="nav-link" href="#!">Sign Up</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#!">Log In</a></li> -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_logout' %}">Log Out</a>
+                        </li>
+                        {% else %}
+                        <li class="nav-item{% block active_signup %}{% endblock %}">
+                            <a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a>
+                        </li>                        
+                        <li class="nav-item{% block active_login %}{% endblock %}">
+                            <a class="nav-link" href="{% url 'account_login' %}">Log In</a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item{% block active_inquiry %}{% endblock %}">
+                            <a class="nav-link" href="{% url 'diary:inquiry' %}">
+                                INQUIRY
+                            </a>
+                        </li>
+                        {% if user.is_authenticated %}
+                            <li class="nav-item {% block active_diary_list %}{% endblock %}">
+                                <a class="nav-link" href="{% url 'diary:diary_list' %}">DIARY LIST</a>
+                            </li>
+                        {% endif %}
+                    </ul>                    
+                    <!-- 左側 -->
+                    <!-- <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                Sign Up
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                Log In
+                            </a>
+                        </li>
+                    </ul> -->
+                </div>
+            </div>
+        </nav>
+
+        <!-- ★★★ 追記(本の通り) ★★★ -->
+        {% block header %}
+        {% endblock %}
+
+        <!-- ★★★メッセージ出力処理を追記(本の通り) ★★★ -->
+        {% if messages %} <!-- メッセージが空ではないかをチェック -->
+         <div class="container">
+            <div class="row">
+                <div class="my-div-style w-100">
+                    <ul class="messages" style="list-style: none;"> <!-- 順序なしリストなのでメッセージの頭には「・」がつかないように -->
+                        {% for message in messages %} <!-- メッセージのリストループさせてメッセージを表示 -->
+                        <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+                        {{ message }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+         </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+        <!-- ★★★ ここまで ★★★ -->
+
+        <!-- Footer-->
+        <footer class="py-5 bg-black">
+            <!-- <div class="container px-5"><p class="m-0 text-center text-white small">Copyright &copy; Your Website 2023</p></div> -->
+            <div class="container px-5"><p class="m-0 text-center text-white small">Copyright &copy; PRIVATE DIARY 2026</p></div>
+            <!-- /.container -->
+        </footer>
+
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS テンプレートに付属しているカスタムJS staticを使用するのが正解-->
+        <!-- <script src="js/scripts.js"></script> -->
+        <script src="{% static 'js/scripts.js' %}"></script>
+    </body>
+</html>

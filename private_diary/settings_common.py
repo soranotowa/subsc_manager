@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 import os
 from pathlib import Path
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,9 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-g$k4_0^#yg(@w3kve)x1xj+zdn%^$t@!0(o-4+ntlq^!dhe^10'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+# ↓settings_devに切り出したためコメントアウト
+# DEBUG = True
+# ↓settings_devに切り出したためコメントアウト
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -48,6 +50,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware', # 2026-03-04追加
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -132,40 +135,73 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-# ロギング設定
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    # ロガーの設定
-    'loggers': {
-        # Djangoが利用するロガー
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-        },
-        # diaryアプリケーションが利用するロガー
-        'diary': {
-            'handlers': ['console'],
-            'level': 'DEBUG'
-        },
-    },
-    # ハンドラの設定
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'dev'
-        },
-    },
-    # フォーマッタの設定
-    'formatters': {
-        'dev': {
-            'format': '\t'.join([
-                '%(asctime)s',
-                '[%(levelname)s]',
-                '%(pathname)s(Line:%(lineno)d)',
-                '%(message)s'
-            ])
-        },
-    }
+MESSAGE_TAGS = {
+    # Bootstrapのalertクラスをメッセージに適用
+    messages.ERROR: 'alert alert-danger',
+    messages.WARNING: 'alert alert-warning',
+    messages.SUCCESS: 'alert alert-success',
+    messages.INFO: 'alert alert-info',    
 }
+
+INSTALLED_APPS = [
+    # 2026-02-28追加 認証用アプリケーションの追加
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    'diary.apps.DiaryConfig',
+    'accounts.apps.AccountsConfig',
+
+    # 2026-03-01追記 allauthを使用可能にする
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+]
+
+# 2026-02-28追加 models.pyで定義したカスタムユーザモデルを設定
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# django-allauthで利用するdjango.contrib.sitesを使うためにサイト識別用IDを設定
+SITE_ID = 1
+
+# 認証バックエンドを2つ設定
+AUTHENTICATION_BACKENDS = (
+    'allauth.account.auth_backends.AuthenticationBackend',
+# 一般ユーザ用　メールアドレス認証
+    'django.contrib.auth.backends.ModelBackend',
+# 管理サイト用　ユーザ名認証
+)
+
+# メールアドレス認証に変更する設定
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_USERNAME_REQUIRED = False
+
+# サインアップにメールアドレス認証を挟むよう設定
+# ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_REQUIRED = True
+
+# ログインログアウト後の遷移先を設定
+LOGIN_REDIRECT_URL = 'diary:diary_list'
+
+ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
+
+# ログアウトリンクのクリック一発でログアウトする設定　※やらないと２回聞かれる
+ACCOUNT_LOGOUT_ON_GET = True
+
+# django-allauthが送信するエールの件名に自動付与される接頭辞をブランクにする設定
+ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
+
+# デフォルトのメール送信元を設定
+DEFAULT_FROM_EMAIL = 'admin@example.com'
+
+# 2026-03-04追加
+MEDIA_URL = '/media/'
+
+# 2026-03-26追加 バックアップバッチ用
+BACKUP_PATH = 'backup/'
+NUM_SAVED_BACKUP = 30
+
