@@ -1,6 +1,3 @@
-venv_private_diary/
-__pycache__/
-*.pyc
-db.sqlite3
-.env
-.DS_Store
+media/
+backup/
+staticfiles/
