@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}お問い合わせ｜サブスク一覧{% endblock %}
+{% block active_inquiry %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="my-div-style col-lg-6 col-md-8 mx-auto">
+
+            <form method="post">
+                {% csrf_token %}
+
+                <table class="table">
+                    {{ form.non_field_errors }}
+
+                    {% for field in form %}
+                        <tr>
+                            <th>{{ field.label }}</th>
+                            <td>
+                                {{ field }}
+                                {{ field.errors }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+
+                <div class="text-center mt-3">
+                    <button class="btn btn-primary" type="submit">送信</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

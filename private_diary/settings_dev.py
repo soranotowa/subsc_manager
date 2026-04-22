@@ -44,7 +44,9 @@ LOGGING = {
     },    
 }
 
+# どうやって送るか
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' 本番ではこっち
 
 # 2026-03-04追加ß
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

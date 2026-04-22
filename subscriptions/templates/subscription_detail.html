@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}サブスク詳細｜サブスク管理{% endblock %}
+
+{% block active_subscription_list %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="my-div-style col-lg-6 col-md-8 mx-auto">
+        <hr>
+        <div class="row">
+            <div class="col-3">
+                <strong>サービス名</strong>
+            </div>
+            <div class="col-9">
+                {# serviceがnullのときにfallback #}
+                {{ object.service.name|default:object.custom_name }}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-3">
+                <strong>メモ</strong>
+            </div>
+            <div class="col-9">
+                {{ object.memo|linebreaksbr }}
+            </div>
+        </div>
+
+        <hr>
+        <div class="row">
+            <div class="col-3">
+                <strong>作成日時</strong>
+            </div>
+            <div class="col-9">
+                {{ object.created_at }}
+            </div>
+        </div>
+
+        <hr>
+        <div class="row">
+            <div class="col-3">
+                <strong>更新日時</strong>
+            </div>
+            <div class="col-9">
+                {{ object.updated_at }}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-3">
+                <strong>次回更新日</strong>
+            </div>
+            <div class="col-9">
+                {{ object.next_renewal_date }}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-3">
+                <strong>更新まで</strong>
+            </div>
+            <div class="col-9">
+                {{ object.days_until_renewal }}
+            </div>
+        </div>
+
+        <a class="btn btn-success mt-5 mb-3" href="{% url 'subscriptions:subscription_update' object.pk %}">編集</a>
+        <a class="btn btn-danger mt-5 ml-2 mb-3" href="{% url 'subscriptions:subscription_delete' object.pk %}">削除</a>
+        <a class="btn btn-secondary mt-5 ml-2 mb-3"href="{% url 'subscriptions:subscription_list' %}">戻る</a>
+    </div>
+</div>
+{% endblock %}

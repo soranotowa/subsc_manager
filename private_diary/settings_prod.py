@@ -58,3 +58,4 @@ X_FRAME_OPTIONS = 'DENY'
 # 2026-3-27追加　静的ファイル設定
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+

@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}サブスク編集｜サブスク管理{% endblock %}
+
+{% block active_subscription_list %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="my-div-style col-lg-6 col-md-8 mx-auto">
+            <form method="POST">
+                {% csrf_token %}
+
+                <table class="table">
+
+                    <!-- カテゴリ -->
+                    <tr>
+                        <th>カテゴリ</th>
+                        <td>
+                            <select id="category-select" class="form-control">
+                                <option value="video"
+                                {% if form.instance.service and form.instance.service.category == "video" %}
+                                    selected
+                                {% endif %}
+                                >動画</option>
+
+                                <option value="music"
+                                {% if form.instance.service and form.instance.service.category == "music" %}
+                                    selected
+                                {% endif %}
+                                >音楽</option>
+
+                                <option value="other"
+                                {% if form.instance.service and form.instance.service.category == "other" %}
+                                    selected
+                                {% endif %}
+                                >その他</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <!-- サービス -->
+                    <tr>
+                        <th>サービス</th>
+                        <td>
+                            <select id="id_service" name="service" class="form-control">
+                                <option value="">選択してください</option>
+                                {% for s in services %}
+                                    <option value="{{ s.id }}" data-category="{{ s.category }}"
+                                        {% if form.instance.service and form.instance.service.id == s.id %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        {{ s.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+
+                    <!-- その他 -->
+                    <tr id="custom-name-field" style="display:none;">
+                        <th>サービス名（その他）</th>
+                        <td>{{ form.custom_name }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>料金</th>
+                        <td>{{ form.price }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>通貨</th>
+                        <td>{{ form.currency }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>開始日</th>
+                        <td>{{ form.start_date }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>更新間隔</th>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                {{ form.interval_value }}
+                                {{ form.interval_unit }}
+                                <span style="white-space: nowrap;">ごと</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>メモ</th>
+                        <td>{{ form.memo }}</td>
+                    </tr>
+                </table>
+
+                <button class="btn btn-primary" type="submit">更新</button>
+                <a class="btn btn-secondary ml-2" href="{% url 'subscriptions:subscription_detail' object.pk %}">キャンセル</a>
+            </form>
+
+            <script>
+            const serviceSelect = document.getElementById("id_service");
+            const otherField = document.getElementById("custom-name-field");
+            const categorySelect = document.getElementById("category-select");
+            const options = serviceSelect.querySelectorAll("option");
+            const initialService = serviceSelect.value;
+
+            // その他表示
+            function toggleField() {
+                const selectedOption = serviceSelect.selectedOptions[0];
+                const isOther = selectedOption?.dataset.category === "other";
+
+                if (isOther) {
+                    otherField.style.display = "table-row";
+                } else {
+                    otherField.style.display = "none";
+                }
+            }
+
+            // カテゴリ絞り込み
+            categorySelect.addEventListener("change", function() {
+                const selectedCategory = this.value;
+
+                options.forEach(option => {
+                    if (!option.value) return;
+
+                    if (selectedCategory === "" || option.dataset.category === selectedCategory) {
+                        option.disabled = false;
+                        option.hidden = false;
+                    } else {
+                        option.disabled = true;
+                        option.hidden = true;
+                    }
+                });
+
+                if (!initialService) {
+                    serviceSelect.value = "";
+                }
+
+                toggleField();
+            });
+
+            // 初期表示で1回だけ実行
+            categorySelect.dispatchEvent(new Event('change'));
+            // サービス変更
+            serviceSelect.addEventListener("change", toggleField);
+            // 初期表示
+            toggleField();
+            </script>
+        </div>
+    </div>
+</div>
+{% endblock %}

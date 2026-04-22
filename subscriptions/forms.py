@@ -1,6 +1,7 @@
 from django import forms
 from django.core.mail import EmailMessage
-from .models import Diary
+# from .models import Diary
+from .models import Subscription
 
 class InquiryForm(forms.Form):
     name = forms.CharField(label='お名前',max_length=30)
@@ -35,12 +36,46 @@ class InquiryForm(forms.Form):
         message = EmailMessage(subject=subject, body=message,from_email=from_email, to=to_list,cc=cc_list)
         message.send()
 
-class DiaryCreateForm(forms.ModelForm):
+
+class SubscriptionForm(forms.ModelForm):
     class Meta:
-        model = Diary
-        fields = ('title', 'content', 'photo1', 'photo2', 'photo3',)
+        model = Subscription
+        fields = (
+            'service', 'custom_name', 'price', 'currency',
+            'start_date', 'interval_value', 'interval_unit', 'memo'
+        )
+        widgets = {
+            'start_date': forms.DateInput(attrs={'type': 'date'}),
+            'interval_value': forms.NumberInput(attrs={'min': 1}),
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
-            
+            field.widget.attrs['placeholder'] = field.label
+
+        self.fields['interval_unit'].empty_label = None
+        self.fields['interval_unit'].initial = 'month'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        service = cleaned_data.get("service")
+        custom_name = cleaned_data.get("custom_name")
+
+        if not service:
+            self.add_error("service", "サービスを選択してください")
+
+        if service and service.category == "other" and not custom_name:
+            self.add_error("custom_name", "その他の場合はサービス名を入力してください")
+
+        return cleaned_data
+    
+    def clean_interval_value(self):
+        value = self.cleaned_data.get('interval_value')
+
+        if value is not None and value < 1:
+            raise forms.ValidationError("1以上の数値を入力してください")
+
+        return value
+

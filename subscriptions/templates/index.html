@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}web上にあなた専用の日記ページを保存できるサービス｜Private Diary{% endblock %}
+{% block title %}web上でサブスクを管理できるサービス｜サブスク一覧{% endblock %}
 
 {% block header %}
         <!-- Header-->
         <header class="masthead text-center text-white">
             <div class="masthead-content">
                 <div class="container px-5">
-                    <h1 class="masthead-heading mb-0">Private Diary</h1>
-                    <h2 class="masthead-subheading mb-0">あなた専用の日記保存サービス</h2>
+                    <h1 class="masthead-heading mb-0">サブスク一覧</h1>
+                    <h2 class="masthead-subheading mb-0">あなた専用のサブスク管理サービス</h2>
                     <!-- ★★★ 2025-02-22変更 ★★★ログインボタンに変更 -->
                     <!-- <a class="btn btn-primary btn-xl rounded-pill mt-5" href="#scroll">Learn More</a> -->
                     <a href="{% url 'account_login' %}" class="btn btn-primary btn-xl rounded-pill mt-5">Log In</a>
@@ -31,8 +31,8 @@
                     </div>
                     <div class="col-lg-6 order-lg-1" >
                         <div class="p-5">
-                            <h2 class="display-4">Web Diary</h2>
-                            <p>Web上で作成・編集・削除ができる日記</p>
+                            <h2 class="display-4">サブスク管理</h2>
+                            <p>契約しているサブスクをまとめて管理できます</p>
                         </div>
                     </div>
                 </div>
@@ -47,8 +47,8 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="p-5">
-                            <h2 class="display-4">Save Your Diary</h2>
-                            <p>あなたの日記をWebに保存</p>
+                            <h2 class="display-4">料金を見える化</h2>
+                            <p>毎月いくら使っているかを把握できます</p>
                         </div>
                     </div>
                 </div>
@@ -63,8 +63,8 @@
                     </div>
                     <div class="col-lg-6  order-lg-1">
                         <div class="p-5">
-                            <h2 class="display-4">Membership System</h2>
-                            <p>会員制のWeb日記サービス</p>
+                            <h2 class="display-4">更新忘れ防止</h2>
+                            <p>更新日を記録して、無駄な課金を防ぎます</p>
                         </div>
                     </div>
                 </div>

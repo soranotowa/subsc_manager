@@ -19,12 +19,19 @@ from django.contrib.staticfiles.urls import static
 from django.urls import path,include
 
 from . import settings_common, settings_dev
+from subscriptions import views
+
+# urlpatterns = [
+#     path('admin/', admin.site.urls),
+#     path('',include('subscriptions.urls')), 
+#     # 2026-03-01追加　allauthがデフォルトで持つurls.pyに処理を委譲
+#     path('accounts/',include('allauth.urls')),
+# ]
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('',include('diary.urls')), 
-    # 2026-03-01追加　allauthがデフォルトで持つurls.pyに処理を委譲
-    path('accounts/',include('allauth.urls')),
+    path('', views.IndexView.as_view(), name='index'),  # ←これがトップ
+    path('subscriptions/', include('subscriptions.urls')),  # ←一覧はこっち
+    path('accounts/', include('allauth.urls')), 
 ]
 
 # 開発サーバでメディアを配信できるようにする設定,ルーティングをurlpatternsに追加

@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}日記削除｜Private Diary{% endblock %}
+{% block title %}サブスク削除｜サブスク管理{% endblock %}
 
-{% block active_diary_list %}active{% endblock %}
+{% block active_subscription_list %}active{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -13,7 +13,7 @@
                 {% csrf_token %}
                 <p>本当に削除しますか？</p>
                 <button class="btn btn-primar mt-5" type="submit">削除</button>
-                <a class="btn btn-secondary mt-5 ml-2" href="{% url 'diary:diary_detail' object.pk %}">キャンセル</a>
+                <a class="btn btn-secondary mt-5 ml-2" href="{% url 'subscriptions:subscription_detail' object.pk %}">キャンセル</a>
             </form>
         </div>
     </div>

@@ -33,49 +33,47 @@
             <div class="container px-5">
                 <!-- クリックするとページの一番上に戻る -->
                 <!--★★★ 2025-02-21変更 ★★★ <a class="navbar-brand" href="#page-top">Start Bootstrap</a> -->
-                <a class="navbar-brand" href="{% url 'diary:index' %}">PRIVATE DIARY</a>
+                <a class="navbar-brand" href="{% url 'index' %}">SUBSC MANAGER</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
-                    <!-- 右側 -->
+
+                    <!-- 左側メニュー -->
                     <ul class="navbar-nav me-auto">
+
                         {% if user.is_authenticated %}
-                        <!--★★★ 2025-02-21変更 ★★★ <li class="nav-item"><a class="nav-link" href="#!">Sign Up</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#!">Log In</a></li> -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'account_logout' %}">Log Out</a>
-                        </li>
-                        {% else %}
-                        <li class="nav-item{% block active_signup %}{% endblock %}">
-                            <a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a>
-                        </li>                        
-                        <li class="nav-item{% block active_login %}{% endblock %}">
-                            <a class="nav-link" href="{% url 'account_login' %}">Log In</a>
-                        </li>
-                        {% endif %}
-                        <li class="nav-item{% block active_inquiry %}{% endblock %}">
-                            <a class="nav-link" href="{% url 'diary:inquiry' %}">
-                                INQUIRY
-                            </a>
-                        </li>
-                        {% if user.is_authenticated %}
-                            <li class="nav-item {% block active_diary_list %}{% endblock %}">
-                                <a class="nav-link" href="{% url 'diary:diary_list' %}">DIARY LIST</a>
+                            <li class="nav-item {% block active_subscription_list %}{% endblock %}">
+                                <a class="nav-link" href="{% url 'subscriptions:subscription_list' %}">サブスク一覧</a>
+                            </li>
+
+                            <li class="nav-item {% block active_subscription_soon %}{% endblock %}">
+                                <a class="nav-link" href="{% url 'subscriptions:subscription_soon' %}">更新間近</a>
                             </li>
                         {% endif %}
-                    </ul>                    
-                    <!-- 左側 -->
-                    <!-- <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                Sign Up
-                            </a>
+
+                        <li class="nav-item {% block active_inquiry %}{% endblock %}">
+                            <a class="nav-link" href="{% url 'subscriptions:inquiry' %}">INQUIRY</a> 
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                Log In
-                            </a>
-                        </li>
-                    </ul> -->
+
+                    </ul>
+
+                    <!-- 右側メニュー -->
+                    <ul class="navbar-nav ms-auto">
+
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'account_logout' %}">Log Out</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item {% block active_signup %}{% endblock %}">
+                                <a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a>
+                            </li>
+                            <li class="nav-item {% block active_login %}{% endblock %}">
+                                <a class="nav-link" href="{% url 'account_login' %}">Log In</a>
+                            </li>
+                        {% endif %}
+
+                    </ul>
+
                 </div>
             </div>
         </nav>
@@ -108,7 +106,7 @@
         <!-- Footer-->
         <footer class="py-5 bg-black">
             <!-- <div class="container px-5"><p class="m-0 text-center text-white small">Copyright &copy; Your Website 2023</p></div> -->
-            <div class="container px-5"><p class="m-0 text-center text-white small">Copyright &copy; PRIVATE DIARY 2026</p></div>
+            <div class="container px-5"><p class="m-0 text-center text-white small">Copyright &copy; サブスク一覧 2026</p></div>
             <!-- /.container -->
         </footer>
 

@@ -1,0 +1,69 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block title%}サブスク一覧{% endblock %}
+
+{% block active_subscription_list %}active{% endblock %}
+
+{% block head %}
+<link href="{% static 'styles_clean-blog.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="my-div-style w-100">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <div class="clearfix mb-4" style="position: sticky; top: 20px; z-index: 10; background: white;">
+                    <a class="btn btn-primary float-right" href="{% url 'subscriptions:subscription_create' %}">
+                        新規作成
+                    </a>
+                </div>
+                {% for subscription in subscription_list %}
+                    <div class="post-preview {% if subscription.is_soon %}bg-warning p-3 rounded{% endif %}">
+                        <a href="{% url 'subscriptions:subscription_detail' subscription.pk %}">
+                            <h2 class="post-title">
+                                {{ subscription.service.name|default:subscription.custom_name|default:"（名称なし）" }}
+
+                                {% if subscription.is_soon %}
+                                    <span class="badge badge-danger ml-2">更新間近</span>
+                                {% endif %}
+                            </h2>
+                        </a>
+                        <p class="post-meta">
+                            月額：{{ subscription.price }}円 /
+                            次回更新日：{{ subscription.next_renewal_date|date:"Y-m-d" }} /
+                            {{ subscription.days_until_renewal }}
+                        </p>
+                    </div>
+                    <hr>
+                {% endfor %}
+                <!-- 2026-3-12追加　ページネーション処理 -->
+                {% if is_paginated %}
+
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">«</a>
+                        </li>
+                    {% endif %}
+
+                    {% for page_num in page_obj.paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == page_num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                        </li>
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">»</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                {% endif %}
+                <!-- ページネーション処理ここまで -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
