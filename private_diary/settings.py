@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-g$k4_0^#yg(@w3kve)x1xj+zdn%^$t@!0(o-4+ntlq^!dhe^10
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'diary.apps.DiaryConfig',
+    'accounts',
+    'subscriptions',
 ]
 
 MIDDLEWARE = [
@@ -87,8 +88,8 @@ DATABASES = {
         'NAME': 'private_diary',
         'USER': os.environ.get('DB_USER'),
         'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': '',
-        'PORT': '',
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     }
 }
 
@@ -144,7 +145,7 @@ LOGGING = {
             'level': 'INFO',
         },
         # diaryアプリケーションが利用するロガー
-        'diary': {
+        'private_diary': {
             'handlers': ['console'],
             'level': 'DEBUG'
         },
