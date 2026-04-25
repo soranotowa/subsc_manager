@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-g$k4_0^#yg(@w3kve)x1xj+zdn%^$t@!0(o-4+ntlq^!dhe^10'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -65,6 +65,7 @@ MIDDLEWARE = [
 ]
 
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
 ROOT_URLCONF = 'private_diary.urls'
 
 TEMPLATES = [
