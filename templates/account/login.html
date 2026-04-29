@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}ログイン | Subsc Manager{% endblock %}
+
+{% block active_login %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="my-div-style w-100">
+                <h1 class="mb-4">ログイン</h1>
+
+                <form method="post" action="{% url 'account_login' %}">
+                    {% csrf_token %}
+
+                    {{ form.non_field_errors }}
+
+                    <div class="mb-3">
+                        {{ form.login.label_tag }}
+                        {{ form.login|add_class:"form-control" }}
+                        <div class="text-danger">
+                            {{ form.login.errors }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.password.label_tag }}
+                        {{ form.password|add_class:"form-control" }}
+                        <div class="text-danger">
+                            {{ form.password.errors }}
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary w-100 mt-3" type="submit">
+                        ログイン
+                    </button>
+
+                    <p class="mt-3 text-center">
+                        <a href="{% url 'account_reset_password' %}">
+                            パスワードを忘れましたか？
+                        </a>
+                    </p>
+
+                    <p class="mt-2 text-center">
+                        アカウントをお持ちでないですか？
+                        <a href="{% url 'account_signup' %}">
+                            新規登録はこちら
+                        </a>
+                    </p>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

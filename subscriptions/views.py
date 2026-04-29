@@ -2,12 +2,8 @@
 import logging
 from django.urls import reverse_lazy
 from django.utils import timezone
-
 from django.views import generic
-from .forms import InquiryForm
-
 from django.contrib import messages
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Subscription
 from .forms import InquiryForm, SubscriptionForm
@@ -18,10 +14,10 @@ logger = logging.getLogger(__name__)
 # TemplateView)　→ トップページは静的ページであるためテンプレートの表示に特化したtemplateViewビューを使用
 # template_name → どのクラスベースビューでも共通で共通で持っているクラス変数、設定するのが必須
 class IndexView(generic.TemplateView):
-    template_name = "index.html"
+    template_name = "subscriptions/index.html"
 
 class InquiryView(generic.FormView):
-    template_name = "inquiry.html"
+    template_name = "subscriptions/inquiry.html"
     form_class = InquiryForm
     success_url = reverse_lazy('subscriptions:inquiry')
 
@@ -34,7 +30,7 @@ class InquiryView(generic.FormView):
 # サブスク一覧を表示させるためのクラス
 class SubscriptionListView(LoginRequiredMixin, generic.ListView):
     model = Subscription
-    template_name = 'subscription_list.html'
+    template_name = 'subscriptions/subscription_list.html'
     paginate_by = 5
 
     def get_queryset(self):
@@ -58,7 +54,7 @@ class SubscriptionListView(LoginRequiredMixin, generic.ListView):
 # サブスクテーブルから必要なデータを取得してテンプレートを描画
 class SubscriptionDetailView(LoginRequiredMixin,generic.DetailView):
     model = Subscription
-    template_name = 'subscription_detail.html'
+    template_name = 'subscriptions/subscription_detail.html'
     # 例えば、pkをidに変更したい場合には以下のように記述する
     # pk_url_kwarg = 'id'
     def get_queryset(self):
@@ -66,7 +62,7 @@ class SubscriptionDetailView(LoginRequiredMixin,generic.DetailView):
 
 class SubscriptionCreateView(LoginRequiredMixin, generic.CreateView):
     model = Subscription
-    template_name = 'subscription_create.html'
+    template_name = 'subscriptions/subscription_create.html'
     form_class = SubscriptionForm # form_classをオーバーライドしてフォームを利用することを宣言
     success_url = reverse_lazy('subscriptions:subscription_list') # 正常に処理が完了した際の遷移先
 
@@ -90,7 +86,7 @@ class SubscriptionCreateView(LoginRequiredMixin, generic.CreateView):
 
 class SubscriptionUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Subscription
-    template_name = 'subscription_update.html'
+    template_name = 'subscriptions/subscription_update.html'
     form_class = SubscriptionForm
 
     def get_context_data(self, **kwargs):
@@ -116,7 +112,7 @@ class SubscriptionUpdateView(LoginRequiredMixin, generic.UpdateView):
     
 class SubscriptionDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Subscription
-    template_name = 'subscription_delete.html'
+    template_name = 'subscriptions/subscription_delete.html'
     success_url = reverse_lazy('subscriptions:subscription_list')
 
     def get_queryset(self):
@@ -129,7 +125,7 @@ class SubscriptionDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 class SoonSubscriptionListView(LoginRequiredMixin, generic.ListView):
     model = Subscription
-    template_name = 'subscription_soon.html'
+    template_name = 'subscriptions/subscription_soon.html'
     paginate_by = 5
 
     def get_queryset(self):

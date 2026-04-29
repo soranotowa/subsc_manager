@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}メール確認 | Subsc Manager{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="my-div-style w-100">
+                <h1 class="mb-4 text-center">メール確認</h1>
+
+                {% if confirmation %}
+                    <p class="text-center">
+                        ユーザー登録を完了するには、<br>
+                        下のボタンを押してください。
+                    </p>
+
+                    <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+                        {% csrf_token %}
+                        <button class="btn btn-primary w-100" type="submit">
+                            登録を確定する
+                        </button>
+                    </form>
+
+                {% else %}
+                    {% url 'account_email' as email_url %}
+                    <p class="text-center">
+                        この確認リンクは無効または期限切れです。<br>
+                        <a href="{{ email_url }}">再度メールを送信する</a>
+                    </p>
+                {% endif %}
+
+                <p class="mt-3 text-center">
+                    <a href="{% url 'account_login' %}">ログイン画面へ</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
