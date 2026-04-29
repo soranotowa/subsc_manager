@@ -30,7 +30,8 @@ SECRET_KEY = 'django-insecure-g$k4_0^#yg(@w3kve)x1xj+zdn%^$t@!0(o-4+ntlq^!dhe^10
 DEBUG = False
 
 # ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = ['.railway.app']
+# ALLOWED_HOSTS = ['.railway.app']
+ALLOWED_HOSTS = ["subscmanager-production-98ac.up.railway.app"]
 # ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 # Application definition
@@ -108,6 +109,9 @@ DATABASES = {
         os.environ.get('DATABASE_URL')
     )
 }
+CSRF_TRUSTED_ORIGINS = [
+    "https://subscmanager-production-98ac.up.railway.app"
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
