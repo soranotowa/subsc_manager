@@ -113,7 +113,9 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 #     }
 # }
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL')
+    )
 }
 
 # Password validation
