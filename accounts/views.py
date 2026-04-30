@@ -35,7 +35,12 @@ def custom_password_reset(request):
         print("📩 POST来た") 
         form = PasswordResetForm(request.POST)
         if form.is_valid():
-            for user in form.get_users(form.cleaned_data["email"]):
+            users = list(form.get_users(form.cleaned_data["email"]))
+            print("👤 users:", users)
+
+            for user in users:
+                print("📧 送信対象:", user.email)
+
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
                 token = default_token_generator.make_token(user)
 
