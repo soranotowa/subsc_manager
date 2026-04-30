@@ -29,7 +29,10 @@ from .mail import send_reset_email
 #         return HttpResponse(f"エラー: {e}")
 
 def custom_password_reset(request):
+    print("🔥 custom_password_reset 呼ばれた") 
+
     if request.method == "POST":
+        print("📩 POST来た") 
         form = PasswordResetForm(request.POST)
         if form.is_valid():
             for user in form.get_users(form.cleaned_data["email"]):
