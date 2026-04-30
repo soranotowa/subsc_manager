@@ -47,7 +47,7 @@ def custom_password_reset(request):
                 domain = get_current_site(request).domain
                 reset_url = f"https://{domain}" + reverse(
                     "account_reset_password_from_key",
-                    kwargs={"uidb64": uid, "key": token}
+                    kwargs={"uidb36": uid, "key": token} 
                 )
 
                 send_reset_email(user.email, reset_url)
