@@ -23,7 +23,7 @@ from subscriptions import views
 from accounts.views import custom_password_reset  # ←追加
 
 urlpatterns = [
-    # 👇 これを一番上に入れる
+    path("admin/", admin.site.urls), 
     path("accounts/password/reset/", custom_password_reset, name="password_reset"),
 
     path('', views.IndexView.as_view(), name='index'),
