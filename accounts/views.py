@@ -15,21 +15,6 @@ from allauth.account.utils import user_pk_to_url_str
 
 from .mail import send_reset_email
 
-# def test_email(request): テスト用
-#     try:
-#         resend.api_key = os.environ["RESEND_API_KEY"]
-
-#         resend.Emails.send({
-#             "from": "onboarding@resend.dev",
-#             "to": "t.soooora@gmail.com",  # ←ここ自分のに
-#             "subject": "テスト",
-#             "html": "<p>メール成功！</p>"
-#         })
-
-#         return HttpResponse("送信OK")
-
-#     except Exception as e:
-#         return HttpResponse(f"エラー: {e}")
 
 def custom_password_reset(request):
     print("🔥 custom_password_reset 呼ばれた") 
@@ -48,10 +33,11 @@ def custom_password_reset(request):
                 token = default_token_generator.make_token(user)
 
                 domain = get_current_site(request).domain
-                reset_url = f"https://{domain}" + reverse(
-                    "account_reset_password_from_key",
-                    kwargs={"uidb36": uid, "key": token}
-                )
+                # reset_url = f"https://{domain}" + reverse(
+                #     "account_reset_password_from_key",
+                #     kwargs={"uidb36": uid, "key": token}
+                # )
+                reset_url = f"https://{domain}/accounts/password/reset/key/{uid}-{token}/"
 
                 send_reset_email(user.email, reset_url)
 
@@ -64,7 +50,7 @@ def custom_password_reset(request):
 def create_superuser(request):
     User = get_user_model()
 
-    if not User.objects.filter(username="admin").exists():
+    if not User.objects.filter(email="test@example.com").exists():
         User.objects.create_superuser(
             username="admin",
             email="test@example.com",
