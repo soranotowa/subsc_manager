@@ -11,39 +11,20 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 
+from allauth.account.forms import ResetPasswordForm
 from allauth.account.utils import user_pk_to_url_str
 
 from .mail import send_reset_email
 
 
 def custom_password_reset(request):
-    print("🔥 custom_password_reset 呼ばれた") 
-
     if request.method == "POST":
-        print("📩 POST来た") 
-        form = PasswordResetForm(request.POST)
+        form = ResetPasswordForm(request.POST)
         if form.is_valid():
-            users = list(form.get_users(form.cleaned_data["email"]))
-            print("👤 users:", users)
-
-            for user in users:
-                print("📧 送信対象:", user.email)
-
-                uid = user_pk_to_url_str(user)
-                token = default_token_generator.make_token(user)
-
-                domain = get_current_site(request).domain
-                # reset_url = f"https://{domain}" + reverse(
-                #     "account_reset_password_from_key",
-                #     kwargs={"uidb36": uid, "key": token}
-                # )
-                reset_url = f"https://{domain}/accounts/password/reset/key/{uid}-{token}/"
-
-                send_reset_email(user.email, reset_url)
-
+            form.save(request=request)  # ← これが全部やる
             return redirect("/accounts/password/reset/done/")
     else:
-        form = PasswordResetForm()
+        form = ResetPasswordForm()
 
     return render(request, "account/password_reset.html", {"form": form})
 
