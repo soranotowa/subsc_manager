@@ -11,6 +11,8 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 
+from allauth.account.utils import user_pk_to_url_str
+
 from .mail import send_reset_email
 
 # def test_email(request): テスト用
@@ -42,13 +44,13 @@ def custom_password_reset(request):
             for user in users:
                 print("📧 送信対象:", user.email)
 
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                uid = user_pk_to_url_str(user)
                 token = default_token_generator.make_token(user)
 
                 domain = get_current_site(request).domain
                 reset_url = f"https://{domain}" + reverse(
                     "account_reset_password_from_key",
-                    kwargs={"uidb36": uid, "key": token} 
+                    kwargs={"uidb36": uid, "key": token}
                 )
 
                 send_reset_email(user.email, reset_url)
