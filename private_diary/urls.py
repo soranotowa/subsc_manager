@@ -20,7 +20,8 @@ from django.urls import path, include
 
 from . import settings_common, settings_dev
 from subscriptions import views
-from accounts.views import custom_password_reset  # ←追加
+from accounts.views import custom_password_reset
+from accounts.views import create_superuser
 
 urlpatterns = [
     path("admin/", admin.site.urls), 
@@ -29,6 +30,7 @@ urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('subscriptions/', include('subscriptions.urls')),
     path('accounts/', include('allauth.urls')),
+    path("create-superuser/", create_superuser),
 ]
 
 urlpatterns += static(

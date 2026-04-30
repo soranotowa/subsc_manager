@@ -8,9 +8,10 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.urls import reverse
+from django.contrib.auth import get_user_model
+from django.http import HttpResponse
 
 from .mail import send_reset_email
-
 
 # def test_email(request): テスト用
 #     try:
@@ -57,3 +58,16 @@ def custom_password_reset(request):
         form = PasswordResetForm()
 
     return render(request, "account/password_reset.html", {"form": form})
+
+def create_superuser(request):
+    User = get_user_model()
+
+    if not User.objects.filter(username="admin").exists():
+        User.objects.create_superuser(
+            username="admin",
+            email="test@example.com",
+            password="1221"
+        )
+        return HttpResponse("superuser created!")
+    
+    return HttpResponse("already exists")
