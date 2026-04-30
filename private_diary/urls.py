@@ -20,11 +20,13 @@ from django.urls import path,include
 
 from . import settings_common, settings_dev
 from subscriptions import views
+from accounts.views import test_email 
 
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),  # ←これがトップ
     path('subscriptions/', include('subscriptions.urls')),  # ←一覧はこっち
     path('accounts/', include('allauth.urls')), 
+    path("test-email/", test_email),
 ]
 
 # 開発サーバでメディアを配信できるようにする設定,ルーティングをurlpatternsに追加
