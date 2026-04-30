@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-print("🔥 SETTINGS LOADED 🔥")
+# print("🔥 SETTINGS LOADED 🔥")
 
 import os
 import dj_database_url
@@ -31,8 +31,8 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = False
 
 # ALLOWED_HOSTS = ['*']
-# ALLOWED_HOSTS = ['.railway.app']
-ALLOWED_HOSTS = ["subscmanager-production-98ac.up.railway.app"]
+ALLOWED_HOSTS = ['.railway.app']
+# ALLOWED_HOSTS = ["subscmanager-production-98ac.up.railway.app"]
 # ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 # Application definition
@@ -122,7 +122,8 @@ DATABASES = {
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://subscmanager-production-98ac.up.railway.app"
+    # "https://subscmanager-production-98ac.up.railway.app"
+    "https://*.railway.app"
 ]
 
 # Password validation
