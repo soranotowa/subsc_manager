@@ -1,8 +1,6 @@
 from django.shortcuts import render, redirect
 
 import os
-import resend
-from django.http import HttpResponse
 
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.sites.shortcuts import get_current_site
@@ -40,8 +38,8 @@ def custom_password_reset(request):
 
                 domain = get_current_site(request).domain
                 reset_url = f"https://{domain}" + reverse(
-                    "password_reset_confirm",
-                    kwargs={"uidb64": uid, "token": token}
+                    "account_reset_password_from_key",
+                    kwargs={"uidb64": uid, "key": token}
                 )
 
                 send_reset_email(user.email, reset_url)
@@ -50,4 +48,4 @@ def custom_password_reset(request):
     else:
         form = PasswordResetForm()
 
-    return render(request, "accounts/password_reset.html", {"form": form})
+    return render(request, "account/password_reset.html", {"form": form})
