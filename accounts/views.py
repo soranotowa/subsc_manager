@@ -1,21 +1,53 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 import os
 import resend
 from django.http import HttpResponse
 
-def test_email(request):
-    try:
-        resend.api_key = os.environ["RESEND_API_KEY"]
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from django.urls import reverse
 
-        resend.Emails.send({
-            "from": "onboarding@resend.dev",
-            "to": "t.soooora@gmail.com",  # ←ここ自分のに
-            "subject": "テスト",
-            "html": "<p>メール成功！</p>"
-        })
+from .mail import send_reset_email
 
-        return HttpResponse("送信OK")
 
-    except Exception as e:
-        return HttpResponse(f"エラー: {e}")
+# def test_email(request): テスト用
+#     try:
+#         resend.api_key = os.environ["RESEND_API_KEY"]
+
+#         resend.Emails.send({
+#             "from": "onboarding@resend.dev",
+#             "to": "t.soooora@gmail.com",  # ←ここ自分のに
+#             "subject": "テスト",
+#             "html": "<p>メール成功！</p>"
+#         })
+
+#         return HttpResponse("送信OK")
+
+#     except Exception as e:
+#         return HttpResponse(f"エラー: {e}")
+
+def custom_password_reset(request):
+    if request.method == "POST":
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            for user in form.get_users(form.cleaned_data["email"]):
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token = default_token_generator.make_token(user)
+
+                domain = get_current_site(request).domain
+                reset_url = f"https://{domain}" + reverse(
+                    "password_reset_confirm",
+                    kwargs={"uidb64": uid, "token": token}
+                )
+
+                send_reset_email(user.email, reset_url)
+
+            return redirect("/accounts/password/reset/done/")
+    else:
+        form = PasswordResetForm()
+
+    return render(request, "accounts/password_reset.html", {"form": form})

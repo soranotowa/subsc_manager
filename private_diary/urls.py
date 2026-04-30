@@ -16,18 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.contrib.staticfiles.urls import static
-from django.urls import path,include
+from django.urls import path, include
 
 from . import settings_common, settings_dev
 from subscriptions import views
-from accounts.views import test_email 
+from accounts.views import custom_password_reset  # ←追加
 
 urlpatterns = [
-    path('', views.IndexView.as_view(), name='index'),  # ←これがトップ
-    path('subscriptions/', include('subscriptions.urls')),  # ←一覧はこっち
-    path('accounts/', include('allauth.urls')), 
-    path("test-email/", test_email),
+    # 👇 これを一番上に入れる
+    path("accounts/password/reset/", custom_password_reset, name="password_reset"),
+
+    path('', views.IndexView.as_view(), name='index'),
+    path('subscriptions/', include('subscriptions.urls')),
+    path('accounts/', include('allauth.urls')),
 ]
 
-# 開発サーバでメディアを配信できるようにする設定,ルーティングをurlpatternsに追加
-urlpatterns += static(settings_common.MEDIA_URL,document_root=settings_dev.MEDIA_ROOT)
+urlpatterns += static(
+    settings_common.MEDIA_URL,
+    document_root=settings_dev.MEDIA_ROOT
+)
