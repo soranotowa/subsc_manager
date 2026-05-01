@@ -132,14 +132,7 @@ class SoonSubscriptionListView(LoginRequiredMixin, generic.ListView):
     
 
 def create_admin(request):
-    User = get_user_model()
-
-    if not User.objects.filter(username='admin').exists():
-        User.objects.create_superuser(
-            username='admin',
-            email='test@example.com',
-            password='password123'
-        )
-        return HttpResponse("admin created")
+    if request.GET.get("key") != "mysecret123":
+        return HttpResponse("forbidden", status=403)
 
     return HttpResponse("admin already exists")
