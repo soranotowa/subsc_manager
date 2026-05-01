@@ -4,6 +4,12 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from django.core.validators import MinValueValidator
 
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
 class Service(models.Model):
     CATEGORY_CHOICES = [
         ('video', '動画'),
