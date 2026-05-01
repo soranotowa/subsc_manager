@@ -114,15 +114,15 @@ class SubscriptionDeleteView(LoginRequiredMixin, generic.DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
-# class SoonSubscriptionListView(LoginRequiredMixin, generic.ListView):
-#     model = Subscription
-#     template_name = 'subscriptions/subscription_soon.html'
-#     paginate_by = 5
+class SoonSubscriptionListView(LoginRequiredMixin, generic.ListView):
+    model = Subscription
+    template_name = 'subscriptions/subscription_soon.html'
+    paginate_by = 5
 
-#     def get_queryset(self):
-#         subs = Subscription.objects.filter(user=self.request.user)\
-#             .select_related('service', 'service__category')
+    def get_queryset(self):
+        subs = Subscription.objects.filter(user=self.request.user)\
+            .select_related('service', 'service__category')
 
-#         soon_subs = [sub for sub in subs if sub.is_soon()]
-#         return sorted(soon_subs, key=lambda x: x.next_renewal_date())
+        soon_subs = [sub for sub in subs if sub.is_soon()]
+        return sorted(soon_subs, key=lambda x: x.next_renewal_date())
     
