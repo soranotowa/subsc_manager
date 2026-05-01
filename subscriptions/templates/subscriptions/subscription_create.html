@@ -85,9 +85,12 @@
             // その他表示
             function toggleField() {
                 const selectedOption = serviceSelect.selectedOptions[0];
-                const isOther = selectedOption?.dataset.category === "other";
+                const selectedCategory = categorySelect.value;
 
-                if (isOther) {
+                const isOtherService = selectedOption?.dataset.category === "other";
+                const isOtherCategory = selectedCategory === "other";
+
+                if (isOtherService || isOtherCategory) {
                     otherField.style.display = "table-row";
                 } else {
                     otherField.style.display = "none";
@@ -102,23 +105,34 @@
             categorySelect.addEventListener("change", function() {
                 const selectedCategory = this.value;
 
+                // まずサービスの有効/無効
+                if (selectedCategory === "other") {
+                    serviceSelect.disabled = true;
+                        // 全部表示に戻す（重要）
+                        options.forEach(option => {
+                            option.hidden = false;
+                        });
+                } else {
+                    serviceSelect.disabled = false;
+                }
+
+                // サービス絞り込み（これが抜けてた）
                 options.forEach(option => {
                     if (!option.value) return;
 
                     if (selectedCategory === "" || option.dataset.category === selectedCategory) {
-                        option.disabled = false;   // ← 変更
-                        option.hidden = false;     // ← 見た目も消す
+                        option.hidden = false;
                     } else {
-                        option.disabled = true;    // ← 変更
                         option.hidden = true;
                     }
                 });
 
+                // 選択リセット
                 serviceSelect.value = "";
+
                 toggleField();
             });
             </script>
-
         </div>
     </div>
 </div>
