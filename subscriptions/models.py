@@ -24,9 +24,9 @@ class Service(models.Model):
     price = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        if self.service:
-            return str(self.service)
-        return self.custom_name
+        if self.plan:
+            return f"{self.name} ({self.plan})"
+        return self.name
 
 class Subscription(models.Model):
 
