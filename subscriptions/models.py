@@ -8,10 +8,19 @@ class Service(models.Model):
     CATEGORY_CHOICES = [
         ('video', '動画'),
         ('music', '音楽'),
-        ('other', 'その他'),
+        ('other', 'その他エンタメ系'),
     ]
-    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
-    name = models.CharField(max_length=255)
+
+    name = models.CharField(max_length=100)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+
+    plan = models.CharField(max_length=100, blank=True)
+    price = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        if self.plan:
+            return f"{self.name} ({self.plan})"
+        return self.name
 
 class Subscription(models.Model):
 
