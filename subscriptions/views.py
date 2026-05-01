@@ -8,6 +8,9 @@ from .models import Subscription
 from .forms import InquiryForm, SubscriptionForm
 from .models import Service, Category
 
+from django.http import HttpResponse
+from django.contrib.auth import get_user_model
+
 logger = logging.getLogger(__name__)
 
 # TemplateView)　→ トップページは静的ページであるためテンプレートの表示に特化したtemplateViewビューを使用
@@ -45,6 +48,7 @@ class SubscriptionListView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         context['groups'] = Category.objects.values_list('group', flat=True).distinct()
 
         return context
@@ -126,3 +130,16 @@ class SoonSubscriptionListView(LoginRequiredMixin, generic.ListView):
         soon_subs = [sub for sub in subs if sub.is_soon()]
         return sorted(soon_subs, key=lambda x: x.next_renewal_date())
     
+
+def create_admin(request):
+    User = get_user_model()
+
+    if not User.objects.filter(username='admin').exists():
+        User.objects.create_superuser(
+            username='admin',
+            email='test@example.com',
+            password='password123'
+        )
+        return HttpResponse("admin created")
+
+    return HttpResponse("admin already exists")
