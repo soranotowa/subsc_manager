@@ -66,7 +66,7 @@ class SubscriptionForm(forms.ModelForm):
         if not service:
             self.add_error("service", "サービスを選択してください")
 
-        if service and service.category == "other" and not custom_name:
+        if service and service.category.group == "other" and not custom_name:
             self.add_error("custom_name", "その他の場合はサービス名を入力してください")
 
         return cleaned_data
