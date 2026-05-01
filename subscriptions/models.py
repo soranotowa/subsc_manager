@@ -18,14 +18,14 @@ class Service(models.Model):
     price = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        if self.plan:
-            return f"{self.name} ({self.plan})"
-        return self.name
+        if self.service:
+            return str(self.service)
+        return self.custom_name
 
 class Subscription(models.Model):
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    price = models.IntegerField("月額料金（円）")
+    price = models.IntegerField("料金（ユーザー設定）")
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True)
     custom_name = models.CharField("サービス名（手入力）", max_length=255, blank=True)
 

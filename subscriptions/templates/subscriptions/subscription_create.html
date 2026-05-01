@@ -30,8 +30,10 @@
                             <select id="id_service" name="service" class="form-control">
                                 <option value="">選択してください</option>
                                 {% for s in services %}
-                                    <option value="{{ s.id }}" data-category="{{ s.category }}">
-                                        {{ s.name }}
+                                    <option value="{{ s.id }}" 
+                                            data-category="{{ s.category }}"
+                                            data-price="{{ s.price }}">
+                                        {{ s.name }}{% if s.plan %}（{{ s.plan }}）{% endif %}
                                     </option>
                                 {% endfor %}
                             </select>
@@ -81,6 +83,7 @@
             const otherField = document.getElementById("custom-name-field");
             const categorySelect = document.getElementById("category-select");
             const options = serviceSelect.querySelectorAll("option");
+            const priceInput = document.getElementById("id_price");
 
             // その他表示
             function toggleField() {
@@ -97,10 +100,18 @@
                 }
             }
 
-            serviceSelect.addEventListener("change", toggleField);
-            // 初期表示
-            toggleField();
+            // // 初期表示
 
+            serviceSelect.addEventListener("change", function() {
+                const selectedOption = this.selectedOptions[0];
+                const price = selectedOption?.dataset.price;
+
+                if (price) {
+                    priceInput.value = price;
+                }
+                toggleField();
+            });
+            
             // カテゴリ絞り込み
             categorySelect.addEventListener("change", function() {
                 const selectedCategory = this.value;
