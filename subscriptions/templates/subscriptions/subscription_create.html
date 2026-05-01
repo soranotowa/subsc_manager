@@ -18,9 +18,9 @@
                     <td>
                         <select id="category-select" class="form-control">
                             <option value="">選択してください</option>
-                            <option value="video">動画</option>
-                            <option value="music">音楽</option>
-                            <option value="other">その他</option>
+                            {% for c in categories %}
+                                <option value="{{ c.id }}">{{ c.name }}</option>
+                            {% endfor %}
                         </select>
                     </td>
                 </tr>
@@ -31,8 +31,9 @@
                                 <option value="">選択してください</option>
                                 {% for s in services %}
                                     <option value="{{ s.id }}" 
-                                            data-category="{{ s.category }}"
-                                            data-price="{{ s.price }}">
+                                        data-category="{{ s.category.id }}"
+                                        data-group="{{ s.category.group }}"
+                                        data-price="{{ s.price }}">
                                         {{ s.name }}{% if s.plan %}（{{ s.plan }}）{% endif %}
                                     </option>
                                 {% endfor %}
@@ -88,10 +89,8 @@
             // その他表示
             function toggleField() {
                 const selectedOption = serviceSelect.selectedOptions[0];
-                const selectedCategory = categorySelect.value;
-
-                const isOtherService = selectedOption?.dataset.category === "other";
-                const isOtherCategory = selectedCategory === "other";
+                const isOtherCategory = categorySelect.value === "other";
+                const isOtherService = selectedOption?.dataset.group === "other";
 
                 if (isOtherService || isOtherCategory) {
                     otherField.style.display = "table-row";
@@ -100,46 +99,40 @@
                 }
             }
 
-            // // 初期表示
-
             serviceSelect.addEventListener("change", function() {
                 const selectedOption = this.selectedOptions[0];
                 const price = selectedOption?.dataset.price;
 
-                if (price) {
+                if (!selectedOption || !selectedOption.value) {
+                    priceInput.value = "";
+                } else if (price !== undefined && price !== "") {
                     priceInput.value = price;
                 }
+
                 toggleField();
             });
+
+            // 初期表示
+            toggleField();
             
             // カテゴリ絞り込み
             categorySelect.addEventListener("change", function() {
                 const selectedCategory = this.value;
 
-                // まずサービスの有効/無効
-                if (selectedCategory === "other") {
-                    serviceSelect.disabled = true;
-                        // 全部表示に戻す（重要）
-                        options.forEach(option => {
-                            option.hidden = false;
-                        });
-                } else {
-                    serviceSelect.disabled = false;
-                }
+                serviceSelect.disabled = false;
 
-                // サービス絞り込み（これが抜けてた）
                 options.forEach(option => {
                     if (!option.value) return;
 
-                    if (selectedCategory === "" || option.dataset.category === selectedCategory) {
+                    if (selectedCategory === "" || option.dataset.category == selectedCategory) {
                         option.hidden = false;
                     } else {
                         option.hidden = true;
                     }
                 });
 
-                // 選択リセット
                 serviceSelect.value = "";
+                priceInput.value = "";
 
                 toggleField();
             });

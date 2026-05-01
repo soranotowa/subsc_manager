@@ -11,8 +11,8 @@
         <div class="my-div-style w-100">
             <form method="POST">
                 {% csrf_token %}
-                <p>本当に削除しますか？</p>
-                <button class="btn btn-primar mt-5" type="submit">削除</button>
+                <p class="text-danger">「{{ object }}」を本当に削除しますか？</p>
+                <button class="btn btn-primary mt-5" type="submit">削除</button>
                 <a class="btn btn-secondary mt-5 ml-2" href="{% url 'subscriptions:subscription_detail' object.pk %}">キャンセル</a>
             </form>
         </div>

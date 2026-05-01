@@ -19,6 +19,23 @@
                         新規作成
                     </a>
                 </div>
+                <div class="mb-3">
+                    <a class="btn btn-sm {% if not request.GET.filter %}btn-secondary{% else %}btn-outline-secondary{% endif %}" href="?">
+                        すべて
+                    </a>
+                    <a class="btn btn-sm {% if request.GET.filter == 'soon' %}btn-warning{% else %}btn-outline-warning{% endif %}" href="?filter=soon">
+                        更新間近
+                    </a>
+                </div>
+                <div class="mb-3">
+                    <a class="btn btn-sm btn-outline-secondary" href="?">すべて</a>
+                    {% for group in groups %}
+                        <a class="btn btn-sm btn-outline-primary"
+                        href="?group={{ group }}">
+                            {{ group }}
+                        </a>
+                    {% endfor %}
+                </div>
                 {% for subscription in subscription_list %}
                     <div class="post-preview {% if subscription.is_soon %}bg-warning p-3 rounded{% endif %}">
                         <a href="{% url 'subscriptions:subscription_detail' subscription.pk %}">
@@ -42,21 +59,31 @@
                 {% if is_paginated %}
 
                 <ul class="pagination justify-content-center">
+
                     {% if page_obj.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">«</a>
+                            <a class="page-link"
+                            href="?page={{ page_obj.previous_page_number }}{% if request.GET.filter %}&filter={{ request.GET.filter }}{% endif %}">
+                                «
+                            </a>
                         </li>
                     {% endif %}
 
                     {% for page_num in page_obj.paginator.page_range %}
                         <li class="page-item {% if page_obj.number == page_num %}active{% endif %}">
-                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                            <a class="page-link"
+                            href="?page={{ page_num }}{% if request.GET.filter %}&filter={{ request.GET.filter }}{% endif %}">
+                                {{ page_num }}
+                            </a>
                         </li>
                     {% endfor %}
 
                     {% if page_obj.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">»</a>
+                            <a class="page-link"
+                            href="?page={{ page_obj.next_page_number }}{% if request.GET.filter %}&filter={{ request.GET.filter }}{% endif %}">
+                                »
+                            </a>
                         </li>
                     {% endif %}
                 </ul>

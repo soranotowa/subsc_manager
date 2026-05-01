@@ -19,23 +19,16 @@
                         <th>カテゴリ</th>
                         <td>
                             <select id="category-select" class="form-control">
-                                <option value="video"
-                                {% if form.instance.service and form.instance.service.category == "video" %}
-                                    selected
-                                {% endif %}
-                                >動画</option>
-
-                                <option value="music"
-                                {% if form.instance.service and form.instance.service.category == "music" %}
-                                    selected
-                                {% endif %}
-                                >音楽</option>
-
-                                <option value="other"
-                                {% if form.instance.service and form.instance.service.category == "other" %}
-                                    selected
-                                {% endif %}
-                                >その他</option>
+                                <option value="">選択してください</option>
+                                {% for c in categories %}
+                                    <option value="{{ c.id }}"
+                                        {% if form.instance.service and form.instance.service.category.id == c.id %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        {{ c.name }}
+                                    </option>
+                                {% endfor %}
                             </select>
                         </td>
                     </tr>
@@ -47,12 +40,15 @@
                             <select id="id_service" name="service" class="form-control">
                                 <option value="">選択してください</option>
                                 {% for s in services %}
-                                    <option value="{{ s.id }}" data-category="{{ s.category }}"
+                                    <option value="{{ s.id }}"
+                                        data-category="{{ s.category.id }}"
+                                        data-group="{{ s.category.group }}"
+                                        data-price="{{ s.price }}"
                                         {% if form.instance.service and form.instance.service.id == s.id %}
                                             selected
                                         {% endif %}
                                     >
-                                        {{ s.name }}
+                                        {{ s.name }}{% if s.plan %}（{{ s.plan }}）{% endif %}
                                     </option>
                                 {% endfor %}
                             </select>
@@ -101,53 +97,81 @@
             </form>
 
             <script>
-            const serviceSelect = document.getElementById("id_service");
-            const otherField = document.getElementById("custom-name-field");
-            const categorySelect = document.getElementById("category-select");
-            const options = serviceSelect.querySelectorAll("option");
-            const initialService = serviceSelect.value;
+                const serviceSelect = document.getElementById("id_service");
+                const otherField = document.getElementById("custom-name-field");
+                const categorySelect = document.getElementById("category-select");
+                const options = serviceSelect.querySelectorAll("option");
+                const priceInput = document.getElementById("id_price");
+                const initialService = serviceSelect.value;
 
-            // その他表示
-            function toggleField() {
-                const selectedOption = serviceSelect.selectedOptions[0];
-                const isOther = selectedOption?.dataset.category === "other";
+                // その他表示
+                function toggleField() {
+                    const selectedOption = serviceSelect.selectedOptions[0];
+                    const isOtherService = selectedOption?.dataset.group === "other";
 
-                if (isOther) {
-                    otherField.style.display = "table-row";
-                } else {
-                    otherField.style.display = "none";
-                }
-            }
-
-            // カテゴリ絞り込み
-            categorySelect.addEventListener("change", function() {
-                const selectedCategory = this.value;
-
-                options.forEach(option => {
-                    if (!option.value) return;
-
-                    if (selectedCategory === "" || option.dataset.category === selectedCategory) {
-                        option.disabled = false;
-                        option.hidden = false;
+                    if (isOtherService) {
+                        otherField.style.display = "table-row";
                     } else {
-                        option.disabled = true;
-                        option.hidden = true;
+                        otherField.style.display = "none";
                     }
+                }
+
+                // サービス変更
+                serviceSelect.addEventListener("change", function() {
+                    const selectedOption = this.selectedOptions[0];
+                    const price = selectedOption?.dataset.price;
+
+                    if (!selectedOption || !selectedOption.value) {
+                        priceInput.value = "";
+                    } else if (price !== undefined && price !== "") {
+                        priceInput.value = price;
+                    }
+
+                    toggleField();
                 });
 
-                if (!initialService) {
-                    serviceSelect.value = "";
-                }
+                // カテゴリ絞り込み
+                categorySelect.addEventListener("change", function() {
+                    const selectedCategory = this.value;
 
-                toggleField();
-            });
+                    let valid = false;
 
-            // 初期表示で1回だけ実行
-            categorySelect.dispatchEvent(new Event('change'));
-            // サービス変更
-            serviceSelect.addEventListener("change", toggleField);
-            // 初期表示
-            toggleField();
+                    options.forEach(option => {
+                        if (!option.value) return;
+
+                        if (selectedCategory === "" || option.dataset.category == selectedCategory) {
+                            option.hidden = false;
+                            option.disabled = false;  // ← これ追加
+
+                            if (option.value === serviceSelect.value) {
+                                valid = true;
+                            }
+                        } else {
+                            option.hidden = true;
+                            option.disabled = true;
+                        }
+                    });
+
+                    // 今の選択が無効ならリセット
+                    if (!valid) {
+                        serviceSelect.value = "";
+                        priceInput.value = "";
+                    }
+
+                    toggleField();
+                });
+
+                // 初期表示（超重要）
+                window.addEventListener("DOMContentLoaded", () => {
+                    // カテゴリが未設定ならサービスから逆算
+                    if (!categorySelect.value && serviceSelect.value) {
+                        const selectedOption = serviceSelect.selectedOptions[0];
+                        categorySelect.value = selectedOption.dataset.category;
+                    }
+
+                    categorySelect.dispatchEvent(new Event("change"));
+                    serviceSelect.dispatchEvent(new Event("change"));
+                });
             </script>
         </div>
     </div>

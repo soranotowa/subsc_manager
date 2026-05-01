@@ -1,13 +1,12 @@
 # Create your views here.
 import logging
 from django.urls import reverse_lazy
-from django.utils import timezone
 from django.views import generic
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Subscription
 from .forms import InquiryForm, SubscriptionForm
-from .models import Service
+from .models import Service, Category
 
 logger = logging.getLogger(__name__)
 
@@ -34,20 +33,19 @@ class SubscriptionListView(LoginRequiredMixin, generic.ListView):
     paginate_by = 5
 
     def get_queryset(self):
-        return Subscription.objects.filter(user=self.request.user)
+        qs = Subscription.objects.filter(user=self.request.user)\
+            .select_related('service', 'service__category')
+
+        group = self.request.GET.get("group")
+
+        if group:
+            qs = qs.filter(service__category__group=group)
+
+        return qs.order_by('start_date')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        today = timezone.now().date()
-
-        context['subscription_list'] = sorted(
-            context['subscription_list'],
-            key=lambda x: (
-                x.next_renewal_date() < today,
-                x.next_renewal_date()
-            )
-        )
+        context['groups'] = Category.objects.values_list('group', flat=True).distinct()
 
         return context
 
@@ -58,7 +56,10 @@ class SubscriptionDetailView(LoginRequiredMixin,generic.DetailView):
     # 例えば、pkをidに変更したい場合には以下のように記述する
     # pk_url_kwarg = 'id'
     def get_queryset(self):
-        return Subscription.objects.filter(user=self.request.user)
+        return Subscription.objects.filter(user=self.request.user)\
+            .select_related('service', 'service__category')\
+            .order_by('start_date')
+
 
 class SubscriptionCreateView(LoginRequiredMixin, generic.CreateView):
     model = Subscription
@@ -66,20 +67,11 @@ class SubscriptionCreateView(LoginRequiredMixin, generic.CreateView):
     form_class = SubscriptionForm # form_classをオーバーライドしてフォームを利用することを宣言
     success_url = reverse_lazy('subscriptions:subscription_list') # 正常に処理が完了した際の遷移先
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['services'] = Service.objects.all()
-        return context
-
-    def form_valid(self, form): # フォームの入力値に問題がなければ実行されるメソッド
-        sub = form.save(commit=False) # ユーザ入力値だけでは不足がある場合DBには保存しないDiaryを取得
-        sub.user = self.request.user # ログインしているユーザのモデルオブジェクトをセット
-        sub.save() # ここでDBに保存
+    def form_valid(self, form):
+        form.instance.user = self.request.user
         messages.success(self.request, 'サブスクを登録しました')
-
-        self.object = sub
         return super().form_valid(form)
-    
+        
     def form_invalid(self, form): # フォームバリデーションが失敗した時に実行されるメソッド
         messages.error(self.request, "サブスクの登録に失敗しました")
         return self.render_to_response(self.get_context_data(form=form))
@@ -89,13 +81,10 @@ class SubscriptionUpdateView(LoginRequiredMixin, generic.UpdateView):
     template_name = 'subscriptions/subscription_update.html'
     form_class = SubscriptionForm
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['services'] = Service.objects.all()
-        return context
-
     def get_queryset(self):
-        return Subscription.objects.filter(user=self.request.user)
+        return Subscription.objects.filter(user=self.request.user)\
+            .select_related('service', 'service__category')\
+            .order_by('start_date')
 
     def  get_success_url(self):
         return reverse_lazy('subscriptions:subscription_detail',kwargs={'pk': self.kwargs['pk']})
@@ -116,21 +105,24 @@ class SubscriptionDeleteView(LoginRequiredMixin, generic.DeleteView):
     success_url = reverse_lazy('subscriptions:subscription_list')
 
     def get_queryset(self):
-        return Subscription.objects.filter(user=self.request.user)
+        return Subscription.objects.filter(user=self.request.user)\
+            .select_related('service', 'service__category')\
+            .order_by('start_date')
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "サブスクを削除しました")
         return super().delete(request, *args, **kwargs)
 
 
-class SoonSubscriptionListView(LoginRequiredMixin, generic.ListView):
-    model = Subscription
-    template_name = 'subscriptions/subscription_soon.html'
-    paginate_by = 5
+# class SoonSubscriptionListView(LoginRequiredMixin, generic.ListView):
+#     model = Subscription
+#     template_name = 'subscriptions/subscription_soon.html'
+#     paginate_by = 5
 
-    def get_queryset(self):
-        subs = Subscription.objects.filter(user=self.request.user)
+#     def get_queryset(self):
+#         subs = Subscription.objects.filter(user=self.request.user)\
+#             .select_related('service', 'service__category')
 
-        soon_subs = [sub for sub in subs if sub.is_soon()]
-        return sorted(soon_subs, key=lambda x: x.next_renewal_date())
+#         soon_subs = [sub for sub in subs if sub.is_soon()]
+#         return sorted(soon_subs, key=lambda x: x.next_renewal_date())
     

@@ -5,20 +5,26 @@ from django.utils import timezone
 from django.core.validators import MinValueValidator
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
+    GROUP_CHOICES = [
+        ('entertainment', 'エンタメ'),
+        ('life', '生活'),
+        ('insurance', '保険'),
+        ('other', 'その他'),
+    ]
+    order = models.IntegerField(default=0)
+
+    name = models.CharField(max_length=100)  # 動画 / 音楽 / 通信
+    group = models.CharField(max_length=20, choices=GROUP_CHOICES)
 
     def __str__(self):
-        return self.name
+        return f"{self.get_group_display()} - {self.name}"
+    
+    class Meta:
+        ordering = ["order"]
 
 class Service(models.Model):
-    CATEGORY_CHOICES = [
-        ('video', '動画'),
-        ('music', '音楽'),
-        ('other', 'その他エンタメ系'),
-    ]
-
     name = models.CharField(max_length=100)
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
     plan = models.CharField(max_length=100, blank=True)
     price = models.IntegerField(null=True, blank=True)
@@ -104,6 +110,6 @@ class Subscription(models.Model):
 
     def __str__(self):
         if self.service:
-            return self.service.name
-        return self.custom_name
+            return f"{self.service.name} - {self.price}円"
+        return f"{self.custom_name} - {self.price}円"
     

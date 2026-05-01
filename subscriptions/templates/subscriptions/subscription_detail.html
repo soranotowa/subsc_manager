@@ -11,14 +11,20 @@
         <hr>
         <div class="row">
             <div class="col-3">
-                <strong>サービス名</strong>
+                <strong>サービス</strong>
             </div>
             <div class="col-9">
-                {# serviceがnullのときにfallback #}
                 {{ object.service.name|default:object.custom_name }}
+                <br>
+                <small class="text-muted">
+                    {% if object.service %}
+                        {{ object.service.category.name }}
+                    {% endif %}
+                </small>
             </div>
         </div>
         <hr>
+        
         <div class="row">
             <div class="col-3">
                 <strong>メモ</strong>
@@ -34,7 +40,7 @@
                 <strong>作成日時</strong>
             </div>
             <div class="col-9">
-                {{ object.created_at }}
+                {{ object.created_at|date:"Y/m/d H:i" }}
             </div>
         </div>
 
@@ -44,7 +50,7 @@
                 <strong>更新日時</strong>
             </div>
             <div class="col-9">
-                {{ object.updated_at }}
+                {{ object.updated_at|date:"Y/m/d H:i" }}
             </div>
         </div>
         <hr>
@@ -53,7 +59,7 @@
                 <strong>次回更新日</strong>
             </div>
             <div class="col-9">
-                {{ object.next_renewal_date }}
+                {{ object.next_renewal_date|date:"Y/m/d" }}
             </div>
         </div>
         <hr>
@@ -65,6 +71,16 @@
                 {{ object.days_until_renewal }}
             </div>
         </div>
+        <hr>        
+        <div class="row">
+            <div class="col-3">
+                <strong>料金</strong>
+            </div>
+            <div class="col-9">
+                {{ object.price }} {{ object.currency }}
+            </div>
+        </div>
+        <hr>
 
         <a class="btn btn-success mt-5 mb-3" href="{% url 'subscriptions:subscription_update' object.pk %}">編集</a>
         <a class="btn btn-danger mt-5 ml-2 mb-3" href="{% url 'subscriptions:subscription_delete' object.pk %}">削除</a>
