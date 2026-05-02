@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Subscription
 from .forms import InquiryForm, SubscriptionForm
 from .models import Service, Category
+from django.db.models import Sum
 
 logger = logging.getLogger(__name__)
 
@@ -37,18 +38,52 @@ class SubscriptionListView(LoginRequiredMixin, generic.ListView):
             .select_related('service', 'service__category')
 
         group = self.request.GET.get("group")
+        filter_type = self.request.GET.get("filter")
 
         if group:
             qs = qs.filter(service__category__group=group)
 
+        if filter_type == "soon":
+            qs = [sub for sub in qs if sub.is_soon()]
+            return sorted(qs, key=lambda x: x.next_renewal_date())
+
         return qs.order_by('start_date')
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['groups'] = Category.objects.values_list('group', flat=True).distinct()
+        ORDER = ['entertainment', 'life', 'insurance', 'saving']
+        groups = Category.objects.values_list('group', flat=True).distinct()
+        sorted_groups = sorted(groups, key=lambda x: ORDER.index(x) if x in ORDER else 999)
+
+        context['groups'] = sorted_groups
+        context['group_labels'] = dict(Category.GROUP_CHOICES)
+
+        # 👇 月額換算で集計
+        qs = Subscription.objects.filter(
+            user=self.request.user,
+            service__isnull=False
+        ).select_related('service__category')
+
+        totals = {}
+
+        for sub in qs:
+            group = sub.service.category.group
+            monthly_price = to_monthly(sub)
+
+            totals[group] = totals.get(group, 0) + monthly_price
+
+        context['totals'] = totals
 
         return context
+    
+    def to_monthly(subscription):
+        if subscription.interval_unit == 'month':
+            return subscription.price / subscription.interval_value
+        elif subscription.interval_unit == 'year':
+            return subscription.price / (subscription.interval_value * 12)
+        return 0
 
 # サブスクテーブルから必要なデータを取得してテンプレートを描画
 class SubscriptionDetailView(LoginRequiredMixin,generic.DetailView):

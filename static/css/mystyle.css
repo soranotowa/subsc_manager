@@ -11,3 +11,20 @@ footer {
 .my-div-style{
     margin-top: 6rem;
 }
+
+/* タブ横スクロール対応 */
+.nav-tabs {
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    scroll-behavior: smooth;
+}
+
+.nav-tabs .nav-link {
+    white-space: nowrap;
+}
+
+.nav-tabs::-webkit-scrollbar {
+    display: none;
+}
