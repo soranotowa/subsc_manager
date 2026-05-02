@@ -34,7 +34,8 @@ class InquiryForm(forms.Form):
 
     def send_email(self):
         print("send_email 実行された")
-
+        print("CONTACT_EMAIL:", settings.CONTACT_EMAIL)
+        print("DEFAULT_FROM_EMAIL:", settings.DEFAULT_FROM_EMAIL)
         # APIキーセット
         resend.api_key = settings.RESEND_API_KEY
 
@@ -55,7 +56,7 @@ class InquiryForm(forms.Form):
         resend.Emails.send({
             "from": settings.DEFAULT_FROM_EMAIL,   # ← そのまま（onboardingでOK）
             "to": settings.CONTACT_EMAIL,        # ← ★ここ変更（自分の受信用）
-            "cc": context['email'],              # ← 送信者にも控え
+            # "cc": context['email'],              # ← 送信者にも控え
             "subject": subject,
             "text": body,
         })
