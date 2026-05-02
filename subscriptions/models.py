@@ -81,6 +81,8 @@ class Subscription(models.Model):
                 next_date += relativedelta(months=self.interval_value)
             elif self.interval_unit == 'year':
                 next_date += relativedelta(years=self.interval_value)
+            else:
+                break  # 念のため
 
         return next_date
 
@@ -98,15 +100,19 @@ class Subscription(models.Model):
             return f"{abs(diff)}日経過"
 
     def is_soon(self):
-        today = timezone.now().date()
-        next_date = self.next_renewal_date()
-        diff = (next_date - today).days
+        diff = (self.next_renewal_date() - timezone.now().date()).days
 
-        if self.interval_unit == 'month':
-            return diff <= 7
-        elif self.interval_unit == 'year':
-            return diff <= 30
-        return False
+        thresholds = {
+            'month': 7,
+            'year': 30,
+        }
+
+        limit = thresholds.get(self.interval_unit)
+
+        if limit is None:
+            return False
+
+        return 0 <= diff <= limit
 
     def __str__(self):
         if self.service:
