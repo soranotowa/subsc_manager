@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Subscription
 from .forms import InquiryForm, SubscriptionForm
 from .models import Service, Category
-from django.db.models import Sum
+from .constants import GROUP_MASTER
 
 logger = logging.getLogger(__name__)
 
@@ -41,47 +41,56 @@ class SubscriptionListView(LoginRequiredMixin, generic.ListView):
     paginate_by = 5
 
     def get_queryset(self):
-        qs = Subscription.objects.filter(user=self.request.user)\
-            .select_related('service', 'service__category')
+        qs = self.get_base_queryset()
 
-        group = self.request.GET.get("group")
+        if self.request.GET.get("filter") == "soon":
+            return sorted(qs, key=lambda x: x.next_renewal_date())
+        return sorted(qs, key=lambda x: x.start_date)
+
+    def get_base_queryset(self):
+        qs = Subscription.objects.filter(user=self.request.user)\
+            .select_related('service__category')
+
+        selected_group = self.request.GET.get("group")
         filter_type = self.request.GET.get("filter")
 
-        if group:
-            qs = qs.filter(service__category__group=group)
+        if selected_group:
+            qs = qs.filter(service__category__group=selected_group)
+
+        qs = list(qs)
 
         if filter_type == "soon":
             qs = [sub for sub in qs if sub.is_soon()]
-            return sorted(qs, key=lambda x: x.next_renewal_date())
 
-        return qs.order_by('start_date')
-
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        ORDER = ['entertainment', 'life', 'insurance', 'saving']
-        groups = Category.objects.values_list('group', flat=True).distinct()
-        sorted_groups = sorted(groups, key=lambda x: ORDER.index(x) if x in ORDER else 999)
+        groups = set(Category.objects.values_list('group', flat=True).distinct())
 
-        context['groups'] = sorted_groups
-        context['group_labels'] = dict(Category.GROUP_CHOICES)
+        context['group_tabs'] = [
+            {'key': key, 'label': label}
+            for key, label in GROUP_MASTER
+            if key in groups
+        ]
 
-        # 👇 月額換算で集計
-        qs = Subscription.objects.filter(user=self.request.user)\
-            .select_related('service__category')
+        # 👇 ここがポイント（再取得しない）
+        qs = context['object_list']
 
         totals = {}
 
         for sub in qs:
-            if not sub.service:
-                continue  # ← とりあえず除外（あとで拡張できる）
+            sub.monthly_price = to_monthly(sub)
 
-            group = sub.service.category.group
-            monthly_price = to_monthly(sub)
-            totals[group] = totals.get(group, 0) + monthly_price
+            if not sub.service:
+                continue
+
+            sub_group = sub.service.category.group
+            totals[sub_group] = totals.get(sub_group, 0) + sub.monthly_price
 
         context['totals'] = totals
+        context['total_all'] = sum(totals.values())
 
         return context
 

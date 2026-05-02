@@ -14,7 +14,9 @@
     <div class="row">
         <div class="my-div-style w-100">
             <div class="col-lg-8 col-md-10 mx-auto">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+
+                    <!-- タブ -->
                     <ul class="nav nav-tabs flex-nowrap overflow-auto">
                         <li class="nav-item">
                             <a class="nav-link {% if not request.GET.group and not request.GET.filter %}active{% endif %}" href="?">
@@ -27,27 +29,28 @@
                             </a>
                         </li>
 
-                        {% for group in groups %}
+                        {% for tab in group_tabs %}
                         <li class="nav-item">
-                            <a class="nav-link {% if request.GET.group == group %}active{% endif %}"
-                            href="?group={{ group }}">
-
-                                {{ group_labels[group] }}
-                                    {% if totals[group] %}
-                                        <small class="text-muted">
-                                            ¥{{ totals[group] }}
-                                        </small>
-                                    {% endif %}
+                            <a class="nav-link {% if request.GET.group == tab.key %}active{% endif %}"
+                            href="?group={{ tab.key }}">
+                                {{ tab.label }}
                             </a>
                         </li>
                         {% endfor %}
-
                     </ul>
-                    <a class="btn btn-primary ml-3"
-                    href="{% url 'subscriptions:subscription_create' %}">
-                        ＋ 新規作成
-                    </a>
-                </div>
+
+                    <!-- 右側：合計 + 新規ボタン -->
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-dark mr-3">
+                            合計：{{ total_all|floatformat:0 }}円 / 月
+                        </span>
+
+                        <a class="btn btn-primary"
+                        href="{% url 'subscriptions:subscription_create' %}">
+                            ＋ 新規作成
+                        </a>
+                    </div>
+                </div> 
                 {% for subscription in subscription_list %}
                     <div class="post-preview {% if subscription.is_soon %}bg-warning p-3 rounded{% endif %}">
                         <a href="{% url 'subscriptions:subscription_detail' subscription.pk %}">
@@ -60,7 +63,7 @@
                             </h2>
                         </a>
                         <p class="post-meta">
-                            月額：{{ subscription.price }}円 /
+                            月額：{{ subscription.monthly_price|floatformat:0 }}円 /
                             次回更新日：{{ subscription.next_renewal_date|date:"Y-m-d" }} /
                             {{ subscription.days_until_renewal }}
                         </p>
@@ -93,7 +96,7 @@
                     {% if page_obj.has_next %}
                         <li class="page-item">
                             <a class="page-link"
-                            href="?page={{ page_obj.next_page_number }}{% if request.GET.filter %}&filter={{ request.GET.filter }}{% endif %}">
+                            href="?page={{ page_obj.next_page_number }}{% if request.GET.filter %}&filter={{ request.GET.filter }}{% endif %}{% if request.GET.group %}&group={{ request.GET.group }}{% endif %}">
                                 »
                             </a>
                         </li>
