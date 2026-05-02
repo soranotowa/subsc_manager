@@ -26,14 +26,17 @@ class IndexView(generic.TemplateView):
 class InquiryView(generic.FormView):
     template_name = "subscriptions/inquiry.html"
     form_class = InquiryForm
-    success_url = reverse_lazy('subscriptions:inquiry')
+    success_url = reverse_lazy('subscriptions:index')
 
     def form_valid(self,form):
         form.send_email()
-        messages.success(self.request, 'メッセージを送信しました')
+        messages.success(self.request, 'お問い合わせを送信しました！')
         logger.info('inquiry sent by {}'.format(form.cleaned_data['name']))
         return super().form_valid(form)
-    
+
+class InquiryDoneView(generic.TemplateView):
+    template_name = "subscriptions/inquiry_done.html"
+
 # サブスク一覧を表示させるためのクラス
 class SubscriptionListView(LoginRequiredMixin, generic.ListView):
     model = Subscription

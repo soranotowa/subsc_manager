@@ -10,5 +10,6 @@ urlpatterns = [
     path('update/<int:pk>/', views.SubscriptionUpdateView.as_view(), name='subscription_update'),
     path('delete/<int:pk>/', views.SubscriptionDeleteView.as_view(), name='subscription_delete'),
     path('inquiry/', views.InquiryView.as_view(), name='inquiry'),
+    path('inquiry/done/', views.InquiryDoneView.as_view(), name='inquiry_done'),
     path('soon/', views.SoonSubscriptionListView.as_view(), name='subscription_soon'),
 ]
