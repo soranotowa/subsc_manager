@@ -52,12 +52,10 @@ class InquiryForm(forms.Form):
             'inquiry/email/inquiry.txt',
             context
         )
-        
-        to_email = settings.CONTACT_EMAIL or settings.DEFAULT_FROM_EMAIL
 
         resend.Emails.send({
             "from": settings.DEFAULT_FROM_EMAIL,
-            "to": to_email,
+            "to": settings.CONTACT_EMAIL,
             "cc": context['email'],
             "subject": subject,
             "text": body,
