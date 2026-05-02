@@ -52,11 +52,13 @@ class InquiryForm(forms.Form):
             'inquiry/email/inquiry.txt',
             context
         )
+        
+        to_email = settings.CONTACT_EMAIL or settings.DEFAULT_FROM_EMAIL
 
         resend.Emails.send({
-            "from": settings.DEFAULT_FROM_EMAIL,   # ← そのまま（onboardingでOK）
-            "to": settings.CONTACT_EMAIL,        # ← ★ここ変更（自分の受信用）
-            # "cc": context['email'],              # ← 送信者にも控え
+            "from": settings.DEFAULT_FROM_EMAIL,
+            "to": to_email,
+            "cc": context['email'],
             "subject": subject,
             "text": body,
         })
