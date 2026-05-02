@@ -44,7 +44,7 @@ class InquiryForm(forms.Form):
 
         # 👇 テンプレートから本文生成
         body = render_to_string(
-            'subscriptions/inquiry/email/inquiry.txt',
+            'inquiry/email/inquiry.txt',
             context
         )
 
