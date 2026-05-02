@@ -58,3 +58,22 @@ class InquiryForm(forms.Form):
 
         email.content_subtype = "plain"  # ← 明示（念のため）
         email.send(fail_silently=False) 
+
+class SubscriptionForm(forms.ModelForm):
+    class Meta:
+        model = Subscription
+        fields = (
+            'service', 'custom_name', 'price', 'currency',
+            'start_date', 'interval_value', 'interval_unit', 'memo'
+        )
+        widgets = {
+            'start_date': forms.DateInput(attrs={'type': 'date'}),
+            'interval_value': forms.NumberInput(attrs={'min': 1}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs['placeholder'] = field.label
