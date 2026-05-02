@@ -11,6 +11,13 @@ from django.db.models import Sum
 
 logger = logging.getLogger(__name__)
 
+def to_monthly(subscription):
+    if subscription.interval_unit == 'month':
+        return subscription.price / subscription.interval_value
+    elif subscription.interval_unit == 'year':
+        return subscription.price / (subscription.interval_value * 12)
+    return 0
+
 # TemplateView)　→ トップページは静的ページであるためテンプレートの表示に特化したtemplateViewビューを使用
 # template_name → どのクラスベースビューでも共通で共通で持っているクラス変数、設定するのが必須
 class IndexView(generic.TemplateView):
@@ -61,29 +68,22 @@ class SubscriptionListView(LoginRequiredMixin, generic.ListView):
         context['group_labels'] = dict(Category.GROUP_CHOICES)
 
         # 👇 月額換算で集計
-        qs = Subscription.objects.filter(
-            user=self.request.user,
-            service__isnull=False
-        ).select_related('service__category')
+        qs = Subscription.objects.filter(user=self.request.user)\
+            .select_related('service__category')
 
         totals = {}
 
         for sub in qs:
+            if not sub.service:
+                continue  # ← とりあえず除外（あとで拡張できる）
+
             group = sub.service.category.group
             monthly_price = to_monthly(sub)
-
             totals[group] = totals.get(group, 0) + monthly_price
 
         context['totals'] = totals
 
         return context
-    
-    def to_monthly(subscription):
-        if subscription.interval_unit == 'month':
-            return subscription.price / subscription.interval_value
-        elif subscription.interval_unit == 'year':
-            return subscription.price / (subscription.interval_value * 12)
-        return 0
 
 # サブスクテーブルから必要なデータを取得してテンプレートを描画
 class SubscriptionDetailView(LoginRequiredMixin,generic.DetailView):
