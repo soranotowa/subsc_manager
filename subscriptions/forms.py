@@ -54,8 +54,8 @@ class InquiryForm(forms.Form):
 
         resend.Emails.send({
             "from": settings.DEFAULT_FROM_EMAIL,   # ← そのまま（onboardingでOK）
-            "to": [settings.CONTACT_EMAIL],        # ← ★ここ変更（自分の受信用）
-            "cc": [context['email']],              # ← 送信者にも控え
+            "to": settings.CONTACT_EMAIL,        # ← ★ここ変更（自分の受信用）
+            "cc": context['email'],              # ← 送信者にも控え
             "subject": subject,
             "text": body,
         })
