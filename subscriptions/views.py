@@ -89,6 +89,7 @@ class SubscriptionListView(LoginRequiredMixin, generic.ListView):
 
         return context
 
+
 # サブスクテーブルから必要なデータを取得してテンプレートを描画
 class SubscriptionDetailView(LoginRequiredMixin,generic.DetailView):
     model = Subscription
@@ -122,6 +123,7 @@ class SubscriptionCreateView(LoginRequiredMixin, generic.CreateView):
         messages.error(self.request, "サブスクの登録に失敗しました")
         return self.render_to_response(self.get_context_data(form=form))
 
+
 class SubscriptionUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Subscription
     template_name = 'subscriptions/subscription_update.html'
@@ -132,17 +134,17 @@ class SubscriptionUpdateView(LoginRequiredMixin, generic.UpdateView):
             .select_related('service', 'service__category')\
             .order_by('start_date')
 
-    def  get_success_url(self):
-        return reverse_lazy('subscriptions:subscription_detail',kwargs={'pk': self.kwargs['pk']})
-        
-    def form_valid(self, form):
-        messages.success(self.request,'サブスク登録を更新しました')
-        return super().form_valid(form)
-    
-    def form_invalid(self, form):
-        messages.error(self.request,'サブスク登録の更新に失敗しました')
-        return super().form_invalid(form)
-    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+        context['services'] = Service.objects.select_related('category').all()
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'subscriptions:subscription_detail',
+            kwargs={'pk': self.kwargs['pk']}
+        )
 
     
 class SubscriptionDeleteView(LoginRequiredMixin, generic.DeleteView):
