@@ -58,7 +58,6 @@ class SubscriptionListView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         groups = set(Category.objects.values_list('group', flat=True).distinct())
 
         context['group_tabs'] = [
@@ -83,6 +82,9 @@ class SubscriptionListView(LoginRequiredMixin, generic.ListView):
 
         context['totals'] = totals
         context['total_all'] = sum(totals.values())
+
+        soon_count = sum(1 for sub in self.get_base_queryset() if sub.is_soon())
+        context['soon_count'] = soon_count
 
         return context
 

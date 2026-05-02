@@ -23,12 +23,6 @@
                                 すべて
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.GET.filter == 'soon' %}active{% endif %}" href="?filter=soon">
-                                更新間近
-                            </a>
-                        </li>
-
                         {% for tab in group_tabs %}
                         <li class="nav-item">
                             <a class="nav-link {% if request.GET.group == tab.key %}active{% endif %}"
@@ -51,6 +45,17 @@
                         </a>
                     </div>
                 </div> 
+                {% if soon_count > 0 %}
+                <div class="alert alert-warning mt-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        ⚠ 更新間近が {{ soon_count }} 件あります
+                    </div>
+                    <a href="{% url 'subscriptions:subscription_soon' %}" class="btn btn-sm btn-outline-dark">
+                        確認する →
+                    </a>
+                </div>
+                {% endif %}
+
                 {% for subscription in subscription_list %}
                     <div class="post-preview {% if subscription.is_soon %}bg-warning p-3 rounded{% endif %}">
                         <a href="{% url 'subscriptions:subscription_detail' subscription.pk %}">
