@@ -8,9 +8,6 @@ from .models import Subscription
 from .forms import InquiryForm, SubscriptionForm
 from .models import Service, Category
 
-from django.http import HttpResponse
-from django.contrib.auth import get_user_model
-
 logger = logging.getLogger(__name__)
 
 # TemplateView)　→ トップページは静的ページであるためテンプレートの表示に特化したtemplateViewビューを使用
@@ -68,8 +65,14 @@ class SubscriptionDetailView(LoginRequiredMixin,generic.DetailView):
 class SubscriptionCreateView(LoginRequiredMixin, generic.CreateView):
     model = Subscription
     template_name = 'subscriptions/subscription_create.html'
-    form_class = SubscriptionForm # form_classをオーバーライドしてフォームを利用することを宣言
-    success_url = reverse_lazy('subscriptions:subscription_list') # 正常に処理が完了した際の遷移先
+    form_class = SubscriptionForm
+    success_url = reverse_lazy('subscriptions:subscription_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+        context['services'] = Service.objects.select_related('category').all()
+        return context
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -130,9 +133,3 @@ class SoonSubscriptionListView(LoginRequiredMixin, generic.ListView):
         soon_subs = [sub for sub in subs if sub.is_soon()]
         return sorted(soon_subs, key=lambda x: x.next_renewal_date())
     
-
-def create_admin(request):
-    if request.GET.get("key") != "mysecret123":
-        return HttpResponse("forbidden", status=403)
-
-    return HttpResponse("admin already exists")

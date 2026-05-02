@@ -11,5 +11,4 @@ urlpatterns = [
     path('delete/<int:pk>/', views.SubscriptionDeleteView.as_view(), name='subscription_delete'),
     path('inquiry/', views.InquiryView.as_view(), name='inquiry'),
     path('soon/', views.SoonSubscriptionListView.as_view(), name='subscription_soon'),
-    path('create-admin/', views.create_admin),
 ]
