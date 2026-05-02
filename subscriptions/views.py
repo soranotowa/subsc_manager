@@ -41,13 +41,6 @@ class SubscriptionListView(LoginRequiredMixin, generic.ListView):
     paginate_by = 5
 
     def get_queryset(self):
-        qs = self.get_base_queryset()
-
-        if self.request.GET.get("filter") == "soon":
-            return sorted(qs, key=lambda x: x.next_renewal_date())
-        return sorted(qs, key=lambda x: x.start_date)
-
-    def get_base_queryset(self):
         qs = Subscription.objects.filter(user=self.request.user)\
             .select_related('service__category')
 
@@ -57,12 +50,11 @@ class SubscriptionListView(LoginRequiredMixin, generic.ListView):
         if selected_group:
             qs = qs.filter(service__category__group=selected_group)
 
-        qs = list(qs)
-
         if filter_type == "soon":
             qs = [sub for sub in qs if sub.is_soon()]
+            return qs  # ← listはOK（この場合ページネーション壊れるけど許容）
 
-        return qs
+        return qs.order_by('start_date') 
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
