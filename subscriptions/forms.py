@@ -3,6 +3,7 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.conf import settings
 from .models import Subscription
+import resend
 
 
 class InquiryForm(forms.Form):
@@ -33,6 +34,10 @@ class InquiryForm(forms.Form):
 
     def send_email(self):
         print("send_email 実行された")
+
+        # APIキーセット
+        resend.api_key = settings.RESEND_API_KEY
+
         context = {
             'name': self.cleaned_data['name'],
             'email': self.cleaned_data['email'],
@@ -42,22 +47,20 @@ class InquiryForm(forms.Form):
 
         subject = f"【お問い合わせ】{context['title']}"
 
-        # 👇 テンプレートから本文生成
+        # 👇 そのまま使える（ナイス構成）
         body = render_to_string(
             'inquiry/email/inquiry.txt',
             context
         )
 
-        email = EmailMessage(
-            subject=subject,
-            body=body,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[settings.DEFAULT_FROM_EMAIL],
-            cc=[context['email']],
-        )
-
-        email.content_subtype = "plain"  # ← 明示（念のため）
-        email.send(fail_silently=False) 
+        # 👇 Resendで送信
+        resend.Emails.send({
+            "from": settings.DEFAULT_FROM_EMAIL,
+            "to": [settings.DEFAULT_FROM_EMAIL],  # 管理者宛
+            "cc": [context['email']],             # 送信者にも控え
+            "subject": subject,
+            "text": body,  # ← txtテンプレ使うならこれ
+        })
 
 class SubscriptionForm(forms.ModelForm):
     class Meta:
