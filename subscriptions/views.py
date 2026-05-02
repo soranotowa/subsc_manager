@@ -52,7 +52,8 @@ class SubscriptionListView(LoginRequiredMixin, generic.ListView):
 
         if filter_type == "soon":
             qs = [sub for sub in qs if sub.is_soon()]
-            return qs  # ← listはOK（この場合ページネーション壊れるけど許容）
+            qs = sorted(qs, key=lambda x: x.next_renewal_date())
+            return qs
 
         return qs.order_by('start_date') 
 
@@ -83,7 +84,7 @@ class SubscriptionListView(LoginRequiredMixin, generic.ListView):
         context['totals'] = totals
         context['total_all'] = sum(totals.values())
 
-        soon_count = sum(1 for sub in self.get_base_queryset() if sub.is_soon())
+        soon_count = sum(1 for sub in qs if sub.is_soon())
         context['soon_count'] = soon_count
 
         return context
