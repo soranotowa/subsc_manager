@@ -47,19 +47,17 @@ class InquiryForm(forms.Form):
 
         subject = f"【お問い合わせ】{context['title']}"
 
-        # 👇 そのまま使える（ナイス構成）
         body = render_to_string(
             'inquiry/email/inquiry.txt',
             context
         )
 
-        # 👇 Resendで送信
         resend.Emails.send({
-            "from": settings.DEFAULT_FROM_EMAIL,
-            "to": [settings.DEFAULT_FROM_EMAIL],  # 管理者宛
-            "cc": [context['email']],             # 送信者にも控え
+            "from": settings.DEFAULT_FROM_EMAIL,   # ← そのまま（onboardingでOK）
+            "to": [settings.CONTACT_EMAIL],        # ← ★ここ変更（自分の受信用）
+            "cc": [context['email']],              # ← 送信者にも控え
             "subject": subject,
-            "text": body,  # ← txtテンプレ使うならこれ
+            "text": body,
         })
 
 class SubscriptionForm(forms.ModelForm):

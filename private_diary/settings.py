@@ -118,6 +118,7 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = False
 ACCOUNT_EMAIL_REQUIRED = True
 
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL")
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
@@ -229,6 +230,3 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-
-print("RESEND_API_KEY:", os.environ.get("RESEND_API_KEY"))
-print("DEFAULT_FROM_EMAIL:", os.environ.get("DEFAULT_FROM_EMAIL"))

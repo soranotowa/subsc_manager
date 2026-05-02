@@ -30,7 +30,7 @@ class InquiryView(generic.FormView):
 
     def form_valid(self,form):
         form.send_email()
-        messages.success(self.request, 'お問い合わせを送信しました！')
+        # messages.success(self.request, 'お問い合わせを送信しました！')
         logger.info('inquiry sent by {}'.format(form.cleaned_data['name']))
         return super().form_valid(form)
 
